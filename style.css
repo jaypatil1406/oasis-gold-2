@@ -79,7 +79,6 @@ body {
   user-select: none;
 }
 
-/* Oasis full image */
 
 .placed.oasis-image {
   position: absolute;
@@ -103,7 +102,6 @@ body {
   
 }
 
-/* Question panel */
 
 .question-panel {
   position: absolute;
@@ -133,8 +131,6 @@ body {
   font-size: 30px;
   color: #2395d4;
 }
-
-/* Top controls */
 
 .top-controls {
   position: absolute;
@@ -168,7 +164,6 @@ body {
   font-size: 42px;
 }
 
-/* Bottom object tray */
 
 .tray {
   position: absolute;
@@ -191,7 +186,6 @@ body {
   gap: 12px;
 }
 
-/* Horizontal scrolling area */
 
 .tray-window {
   height: 100%;
@@ -209,7 +203,6 @@ body {
   display: none;
 }
 
-/* Objects inside tray */
 
 .tray-track {
   height: 100%;
@@ -251,7 +244,6 @@ body {
   text-shadow: 0 1px #fff;
 }
 
-/* Arrow buttons */
 
 .arrow {
   flex: 0 0 50px;
@@ -271,7 +263,6 @@ body {
   cursor: default;
 }
 
-/* Drag image */
 
 .drag-ghost {
   position: fixed;
@@ -284,7 +275,6 @@ body {
   filter: drop-shadow(2px 3px 2px #59432b);
 }
 
-/* Responsive layout */
 
 @media (max-width: 900px) {
   .question-panel {
