@@ -1,29 +1,24 @@
 
 const items = [
-  {id:"snow",label:"Snow",image:"Snow.png"},
-  {id:"clownfish",label:"Clownfish",image:"Clown_fish.png"},
-  {id:"ghafTree",label:"Ghaf tree",image:"Ghaf_tree.png"},
-  {id:"penguin",label:"Penguin",image:"Penguin.png"},
-  {id:"elephant",label:"Elephant",image:"Elephant.png"},
-  {id:"oasis",label:"Oasis",image:"Oasis.png"},
-  {id:"fox",label:"Fox",image:"Fox_2.png"},
-  {id:"rocks",label:"Rocks",image:"Rock_01.png"},
-  {id:"sand",label:"Sand",image:"Sand.png"},
-  {id:"mud",label:"Mud",image:"Mud.png"},
-  {id:"oceanWaves",label:"Ocean waves",image:"Ocean_wave.png"},
-  {id:"iceSurface",label:"Ice surface",image:"Ice_surface.png"},
-  {id:"oryx",label:"Oryx",image:"Orynx.png"},
-  {id:"lizard",label:"Lizard",image:"Lizard.png"},
-  {id:"desertGrasses",label:"Desert grasses",image:"Food.png"},
-  {id:"pineTree",label:"Pine tree",image:"Pine_tree.png"}
+  { id: "snow", label: "Snow", image: "Snow.png" },
+  { id: "clownfish", label: "Clownfish", image: "Clown_fish.png" },
+  { id: "ghafTree", label: "Ghaf tree", image: "Ghaf_tree.png" },
+  { id: "penguin", label: "Penguin", image: "Penguin.png" },
+  { id: "elephant", label: "Elephant", image: "Elephant.png" },
+  { id: "oasis", label: "Oasis", image: "Oasis.png" },
+  { id: "fox", label: "Fox", image: "Fox_2.png" },
+  { id: "rocks", label: "Rocks", image: "Rock_01.png" },
+  { id: "sand", label: "Sand", image: "Sand.png" },
+  { id: "mud", label: "Mud", image: "Mud.png" },
+  { id: "oceanWaves", label: "Ocean waves", image: "Ocean_wave.png" },
+  { id: "iceSurface", label: "Ice surface", image: "Ice_surface.png" },
+  { id: "oryx", label: "Oryx", image: "Orynx.png" },
+  { id: "lizard", label: "Lizard", image: "Lizard.png" },
+  { id: "desertGrasses", label: "Desert grasses", image: "Food.png" },
+  { id: "pineTree", label: "Pine tree", image: "Pine_tree.png" },
 ];
 
-const allowedItems = [
-  "oasis",
-  "rocks",
-  "sand",
-  "mud"
-];
+const allowedItems = ["oasis", "rocks", "sand", "mud"];
 
 const trayTrack = document.getElementById("trayTrack");
 const trayWindow = document.getElementById("trayWindow");
@@ -61,29 +56,26 @@ function renderTray() {
 }
 
 function updateArrows() {
-  const maxScroll =
-    trayWindow.scrollWidth - trayWindow.clientWidth;
+  const maxScroll = trayWindow.scrollWidth - trayWindow.clientWidth;
 
   leftArrow.disabled = trayWindow.scrollLeft <= 1;
 
-  rightArrow.disabled =
-    trayWindow.scrollLeft >= maxScroll - 1;
+  rightArrow.disabled = trayWindow.scrollLeft >= maxScroll - 1;
 }
 
 leftArrow.addEventListener("click", () => {
   trayWindow.scrollBy({
     left: -trayWindow.clientWidth,
-    behavior: "smooth"
+    behavior: "smooth",
   });
 });
 
 rightArrow.addEventListener("click", () => {
   trayWindow.scrollBy({
     left: trayWindow.clientWidth,
-    behavior: "smooth"
+    behavior: "smooth",
   });
 });
-
 
 trayWindow.addEventListener("scroll", updateArrows);
 
@@ -103,13 +95,13 @@ function startDrag(event, item, sourceCard) {
     item,
     sourceCard,
     ghost,
-    fromScene: false
+    fromScene: false,
   };
 
   moveGhost(event.clientX, event.clientY);
 
   document.addEventListener("mousemove", moveDrag);
-  document.addEventListener("mouseup", endDrag, {once:true});
+  document.addEventListener("mouseup", endDrag, { once: true });
 }
 
 function startPlacedDrag(event, itemId, imageElement) {
@@ -132,13 +124,13 @@ function startPlacedDrag(event, itemId, imageElement) {
     item,
     ghost,
     fromScene: true,
-    original: imageElement
+    original: imageElement,
   };
 
   moveGhost(event.clientX, event.clientY);
 
   document.addEventListener("mousemove", moveDrag);
-  document.addEventListener("mouseup", endDrag, {once:true});
+  document.addEventListener("mouseup", endDrag, { once: true });
 }
 
 function moveGhost(x, y) {
@@ -148,15 +140,14 @@ function moveGhost(x, y) {
   drag.ghost.style.top = `${y}px`;
 }
 
+function moveDrag(event) {
   moveGhost(event.clientX, event.clientY);
 }
-
 
 function endDrag(event) {
   if (!drag) return;
 
-  const trayRect =
-    document.querySelector(".tray").getBoundingClientRect();
+  const trayRect = document.querySelector(".tray").getBoundingClientRect();
 
   const sceneRect = scene.getBoundingClientRect();
 
@@ -174,12 +165,9 @@ function endDrag(event) {
     event.clientY < trayRect.top;
 
   if (drag.fromScene && droppedInTray) {
-
     drag.original.remove();
 
-  
     if (drag.item.id === "oasis") {
-
       oasisPlaced = false;
       rocksPlaced = 0;
 
@@ -188,16 +176,13 @@ function endDrag(event) {
       document.getElementById("treeImage").src =
         "assets/Ghaf_tree_yellow_leaves8.png";
 
-  
-      const sun =
-        placedObjects.querySelector(".sun-decoration");
+      const sun = placedObjects.querySelector(".sun-decoration");
 
       if (sun) {
         sun.remove();
       }
 
-      const rocks =
-        placedObjects.querySelectorAll('[data-item-id="rocks"]');
+      const rocks = placedObjects.querySelectorAll('[data-item-id="rocks"]');
 
       rocks.forEach((rock) => rock.remove());
     }
@@ -205,10 +190,7 @@ function endDrag(event) {
     if (drag.item.id === "rocks") {
       rocksPlaced = Math.max(0, rocksPlaced - 1);
     }
-  }
-
-  else if (!drag.fromScene && droppedInScene) {
-
+  } else if (!drag.fromScene && droppedInScene) {
     if (allowedItems.includes(drag.item.id)) {
       placeItem(drag.item);
     }
@@ -223,17 +205,14 @@ function endDrag(event) {
 }
 
 function placeItem(item) {
-
   if (item.id === "oasis") {
-
     if (oasisPlaced) return;
 
     oasisPlaced = true;
 
     scene.classList.add("oasis-active");
 
-    document.getElementById("treeImage").src =
-      "assets/Ghaf_tree_OA2.png";
+    document.getElementById("treeImage").src = "assets/Ghaf_tree_OA2.png";
 
     const oasis = document.createElement("img");
 
@@ -241,7 +220,6 @@ function placeItem(item) {
     oasis.alt = "Oasis water";
     oasis.className = "placed oasis-image";
     oasis.dataset.itemId = "oasis";
-
 
     oasis.style.left = "48%";
     oasis.style.top = "59%";
@@ -273,7 +251,6 @@ function placeItem(item) {
   }
 
   if (item.id === "rocks") {
-
     if (!oasisPlaced || rocksPlaced >= 1) return;
 
     const rock = document.createElement("img");
@@ -301,7 +278,6 @@ function placeItem(item) {
   }
 
   if (item.id === "sand") {
-
     const sand = document.createElement("img");
 
     sand.src = `assets/${item.image}`;
@@ -325,7 +301,6 @@ function placeItem(item) {
   }
 
   if (item.id === "mud") {
-
     const mud = document.createElement("img");
 
     mud.src = `assets/${item.image}`;
@@ -350,20 +325,16 @@ function placeItem(item) {
 }
 
 document.getElementById("resetButton").addEventListener("click", () => {
-
   placedObjects.innerHTML = "";
 
   oasisPlaced = false;
   rocksPlaced = 0;
 
- 
   scene.classList.remove("oasis-active");
-  
+
   document.getElementById("treeImage").src =
     "assets/Ghaf_tree_yellow_leaves8.png";
-
 });
-
 
 window.addEventListener("resize", updateArrows);
 
