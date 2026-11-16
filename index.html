@@ -1,0 +1,72 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Trouble in the Oasis</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+  <main id="game" aria-label="Trouble in the Oasis game">
+
+    <section id="scene">
+
+      <div id="tree" class="scene-object" aria-label="Ghaf tree">
+        <img
+          id="treeImage"
+          src="assets/Ghaf_tree_yellow_leaves8.png"
+          alt="Dry Ghaf tree"
+        />
+      </div>
+
+      <div id="placedObjects"></div>
+
+    </section>
+
+    <div class="question-panel">
+      <span class="speaker" aria-hidden="true">◖))</span>
+      <span>
+        Drag the non-living things<br />
+        that you can find in the desert.
+      </span>
+    </div>
+
+    <div class="top-controls" aria-label="Game controls">
+      <button class="round-control music" title="Audio">♫</button>
+
+      <button
+        class="round-control reset"
+        id="resetButton"
+        title="Reset"
+      >
+        ↻
+      </button>
+
+      <button class="round-control close" title="Close">×</button>
+    </div>
+
+    <section class="tray" aria-label="Object tray">
+
+      <button class="arrow left" id="leftArrow" aria-label="Scroll left">
+        ◀
+      </button>
+
+      <div class="tray-window" id="trayWindow">
+        <div class="tray-track" id="trayTrack"></div>
+      </div>
+
+      <button class="arrow right" id="rightArrow" aria-label="Scroll right">
+        ▶
+      </button>
+
+    </section>
+
+  </main>
+
+  <script src="script.js"></script>
+
+</body>
+</html>

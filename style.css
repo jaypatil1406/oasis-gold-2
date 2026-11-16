@@ -1,0 +1,328 @@
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #f4bf79;
+  font-family: Arial, sans-serif;
+}
+
+#game {
+  position: relative;
+  width: min(100vw, 177.7778vh);
+  height: min(100vh, 56.25vw);
+  margin: auto;
+  overflow: hidden;
+  background: #35c6d7;
+}
+
+#scene {
+  position: absolute;
+  inset: 0;
+  background: url("assets/Trouble_in_the_Oasis_Title_Screen_BG1.png")
+    center / 100% 100% no-repeat;
+}
+
+#scene.oasis-active {
+  background-image: url("assets/Smooth_Desert_BG.png");
+}
+
+#scene:after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: rgba(38, 205, 216, 0.08);
+}
+
+.scene-object {
+  position: absolute;
+  z-index: 2;
+  user-select: none;
+}
+
+#tree {
+  left: 8.2%;
+  top: 20%;
+  width: 24%;
+  height: 43%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+#tree img {
+  width: 100%;
+  height: 300%;
+  object-fit: contain;
+  object-position: center bottom;
+  pointer-events: none;
+}
+
+#placedObjects {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.placed {
+  position: absolute;
+  object-fit: contain;
+  pointer-events: auto;
+  cursor: grab;
+  user-select: none;
+}
+
+/* Oasis full image */
+
+.placed.oasis-image {
+  position: absolute;
+  left: 48%;
+  top: 59%;
+  width: 27%;
+  height: 17%;
+  object-fit: contain;
+  object-position: center;
+}
+
+.sun-decoration {
+  position: absolute;
+  left: 29%;
+  top: 15%;
+  width: 8%;
+  height: 12%;
+  object-fit: contain;
+  pointer-events: none;
+  z-index: 4;
+  
+}
+
+/* Question panel */
+
+.question-panel {
+  position: absolute;
+  z-index: 8;
+  top: 2.8%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 500px;
+  height: 100px;
+  padding: 18px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 26px;
+  border: 2px solid #5c7776;
+  border-radius: 13px;
+  background: #e9f8f6;
+  box-shadow: 7px 7px 0 #172b2b;
+  color: #53406c;
+  text-align: center;
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 1.15;
+}
+
+.speaker {
+  font-size: 30px;
+  color: #2395d4;
+}
+
+/* Top controls */
+
+.top-controls {
+  position: absolute;
+  z-index: 9;
+  right: 2.2%;
+  top: 2.5%;
+  display: flex;
+  gap: 10px;
+}
+
+.round-control {
+  width: 85px;
+  height: 85px;
+  border: 3px solid #6d6259;
+  border-radius: 50%;
+  font-size: 48px;
+  line-height: 1;
+  background: #75b8fa;
+  color: white;
+  text-shadow: 1px 2px #455b75;
+  box-shadow: 3px 4px 0 #4b3a2a;
+  cursor: pointer;
+}
+
+.round-control.close {
+  background: #ff6668;
+  font-size: 46px;
+}
+
+.round-control.reset {
+  font-size: 42px;
+}
+
+/* Bottom object tray */
+
+.tray {
+  position: absolute;
+  z-index: 10;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(1816px, calc(100% - 48px));
+  bottom: 20px;
+  height: 175px;
+  border: 3px solid #8c602d;
+  border-radius: 15px;
+  background: #fff3df;
+  box-shadow:
+    inset 0 0 0 7px #e6c08e,
+    inset 0 0 0 9px #b68b52,
+    9px 10px 0 rgba(84, 52, 20, 0.78);
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  gap: 12px;
+}
+
+/* Horizontal scrolling area */
+
+.tray-window {
+  height: 100%;
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  display: flex;
+  align-items: center;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tray-window::-webkit-scrollbar {
+  display: none;
+}
+
+/* Objects inside tray */
+
+.tray-track {
+  height: 100%;
+  width: max-content;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 0 4px;
+  flex-shrink: 0;
+}
+
+.tray-item {
+  flex: 0 0 170px;
+  width: 170px;
+  height: 80%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+}
+
+.tray-item img {
+  width: 150px;
+  height: 118px;
+  max-height: 72%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.tray-item span {
+  font-size: 24px;
+  font-weight: 700;
+  color: #65451e;
+  white-space: nowrap;
+  text-shadow: 0 1px #fff;
+}
+
+/* Arrow buttons */
+
+.arrow {
+  flex: 0 0 50px;
+  width: 50px;
+  height: 53px;
+  border: 1px solid #8a765e;
+  border-radius: 7px;
+  background: #e6f6f4;
+  color: #3698a7;
+  font-size: 23px;
+  cursor: pointer;
+  box-shadow: 2px 3px 0 #9b805c;
+}
+
+.arrow:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* Drag image */
+
+.drag-ghost {
+  position: fixed;
+  z-index: 1000;
+  width: 150px;
+  height: 118px;
+  object-fit: contain;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  filter: drop-shadow(2px 3px 2px #59432b);
+}
+
+/* Responsive layout */
+
+@media (max-width: 900px) {
+  .question-panel {
+    transform: translateX(-50%) scale(0.55);
+    transform-origin: top center;
+  }
+
+  .top-controls {
+    transform: scale(0.55);
+    transform-origin: top right;
+  }
+
+  .tray {
+    width: calc(100% - 24px);
+    height: 20%;
+    min-height: 110px;
+    max-height: 216px;
+    bottom: 5%;
+    padding: 0 7px;
+    gap: 5px;
+  }
+
+  .tray-item {
+    flex-basis: 115px;
+    width: 115px;
+  }
+
+  .tray-item img {
+    width: 112px;
+  }
+
+  .tray-item span {
+    font-size: 14px;
+  }
+
+  .arrow {
+    flex-basis: 30px;
+    width: 30px;
+    height: 44px;
+  }
+}
