@@ -79,7 +79,6 @@ body {
   user-select: none;
 }
 
-
 .placed.oasis-image {
   position: absolute;
   left: 48%;
@@ -99,9 +98,7 @@ body {
   object-fit: contain;
   pointer-events: none;
   z-index: 4;
-  
 }
-
 
 .question-panel {
   position: absolute;
@@ -164,7 +161,6 @@ body {
   font-size: 42px;
 }
 
-
 .tray {
   position: absolute;
   z-index: 10;
@@ -186,7 +182,6 @@ body {
   gap: 12px;
 }
 
-
 .tray-window {
   height: 100%;
   flex: 1;
@@ -195,14 +190,15 @@ body {
   overflow-y: hidden;
   display: flex;
   align-items: center;
+  scroll-behavior: smooth;
   scrollbar-width: none;
+  touch-action: pan-x;
   -webkit-overflow-scrolling: touch;
 }
 
 .tray-window::-webkit-scrollbar {
   display: none;
 }
-
 
 .tray-track {
   height: 100%;
@@ -244,7 +240,6 @@ body {
   text-shadow: 0 1px #fff;
 }
 
-
 .arrow {
   flex: 0 0 50px;
   width: 50px;
@@ -263,7 +258,6 @@ body {
   cursor: default;
 }
 
-
 .drag-ghost {
   position: fixed;
   z-index: 1000;
@@ -274,7 +268,6 @@ body {
   transform: translate(-50%, -50%);
   filter: drop-shadow(2px 3px 2px #59432b);
 }
-
 
 @media (max-width: 900px) {
   .question-panel {
