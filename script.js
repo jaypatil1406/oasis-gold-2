@@ -78,6 +78,14 @@ rightArrow.addEventListener("click", () => {
 });
 
 trayWindow.addEventListener("scroll", updateArrows);
+trayWindow.addEventListener("wheel", (event) => {
+  event.preventDefault();
+
+  trayWindow.scrollBy({
+    left: event.deltaY > 0 ? 100 : -100,
+    behavior: "smooth",
+  });
+}, { passive: false });
 
 function startDrag(event, item, sourceCard) {
   if (event.button !== 0) return;
