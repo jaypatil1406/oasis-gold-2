@@ -18,7 +18,6 @@ const items = [
   {id:"pineTree",label:"Pine tree",image:"Pine_tree.png"}
 ];
 
-// Only these four objects can be placed
 const allowedItems = [
   "oasis",
   "rocks",
@@ -37,7 +36,6 @@ let drag = null;
 let oasisPlaced = false;
 let rocksPlaced = 0;
 
-// Render all objects inside the tray
 function renderTray() {
   trayTrack.innerHTML = "";
 
@@ -62,7 +60,6 @@ function renderTray() {
   updateArrows();
 }
 
-// Update arrow button states
 function updateArrows() {
   const maxScroll =
     trayWindow.scrollWidth - trayWindow.clientWidth;
@@ -73,7 +70,6 @@ function updateArrows() {
     trayWindow.scrollLeft >= maxScroll - 1;
 }
 
-// Scroll left
 leftArrow.addEventListener("click", () => {
   trayWindow.scrollBy({
     left: -trayWindow.clientWidth,
@@ -81,7 +77,6 @@ leftArrow.addEventListener("click", () => {
   });
 });
 
-// Scroll right
 rightArrow.addEventListener("click", () => {
   trayWindow.scrollBy({
     left: trayWindow.clientWidth,
@@ -89,10 +84,9 @@ rightArrow.addEventListener("click", () => {
   });
 });
 
-// Update arrows while scrolling
+
 trayWindow.addEventListener("scroll", updateArrows);
 
-// Start dragging an object from the tray
 function startDrag(event, item, sourceCard) {
   if (event.button !== 0) return;
 
@@ -118,7 +112,6 @@ function startDrag(event, item, sourceCard) {
   document.addEventListener("mouseup", endDrag, {once:true});
 }
 
-// Start dragging an object already placed in the scene
 function startPlacedDrag(event, itemId, imageElement) {
   if (event.button !== 0) return;
 
@@ -148,7 +141,6 @@ function startPlacedDrag(event, itemId, imageElement) {
   document.addEventListener("mouseup", endDrag, {once:true});
 }
 
-// Move dragged image
 function moveGhost(x, y) {
   if (!drag) return;
 
@@ -156,12 +148,10 @@ function moveGhost(x, y) {
   drag.ghost.style.top = `${y}px`;
 }
 
-// Handle mouse movement
-function moveDrag(event) {
   moveGhost(event.clientX, event.clientY);
 }
 
-// Handle dropping an object
+
 function endDrag(event) {
   if (!drag) return;
 
@@ -183,12 +173,11 @@ function endDrag(event) {
     event.clientY <= sceneRect.bottom &&
     event.clientY < trayRect.top;
 
-  // Return an object from scene to tray
   if (drag.fromScene && droppedInTray) {
 
     drag.original.remove();
 
-    // Remove Oasis and restore original scene
+  
     if (drag.item.id === "oasis") {
 
       oasisPlaced = false;
@@ -196,11 +185,10 @@ function endDrag(event) {
 
       scene.classList.remove("oasis-active");
 
-      // Restore dry Ghaf tree
       document.getElementById("treeImage").src =
         "assets/Ghaf_tree_yellow_leaves8.png";
 
-      // Remove the sun
+  
       const sun =
         placedObjects.querySelector(".sun-decoration");
 
@@ -208,20 +196,17 @@ function endDrag(event) {
         sun.remove();
       }
 
-      // Remove placed rocks
       const rocks =
         placedObjects.querySelectorAll('[data-item-id="rocks"]');
 
       rocks.forEach((rock) => rock.remove());
     }
 
-    // Update rocks count
     if (drag.item.id === "rocks") {
       rocksPlaced = Math.max(0, rocksPlaced - 1);
     }
   }
 
-  // Place a new object in the scene
   else if (!drag.fromScene && droppedInScene) {
 
     if (allowedItems.includes(drag.item.id)) {
@@ -237,24 +222,19 @@ function endDrag(event) {
   updateArrows();
 }
 
-// Place an object inside the scene
 function placeItem(item) {
 
-  // Place Oasis in the RED area
   if (item.id === "oasis") {
 
     if (oasisPlaced) return;
 
     oasisPlaced = true;
 
-    // Change the desert background
     scene.classList.add("oasis-active");
 
-    // Change dry tree into green Ghaf tree
     document.getElementById("treeImage").src =
       "assets/Ghaf_tree_OA2.png";
 
-    // Create complete Oasis image
     const oasis = document.createElement("img");
 
     oasis.src = "assets/Oasis.png";
@@ -262,7 +242,7 @@ function placeItem(item) {
     oasis.className = "placed oasis-image";
     oasis.dataset.itemId = "oasis";
 
-    // Red area position
+
     oasis.style.left = "48%";
     oasis.style.top = "59%";
     oasis.style.width = "27%";
@@ -275,14 +255,12 @@ function placeItem(item) {
 
     placedObjects.appendChild(oasis);
 
-    // Add Sun near the Ghaf tree
     const sun = document.createElement("img");
 
     sun.src = "assets/Sun.png";
     sun.alt = "Sun";
     sun.className = "sun-decoration";
 
-    // Sun position
     sun.style.left = "29%";
     sun.style.top = "15%";
     sun.style.width = "8%";
@@ -294,7 +272,6 @@ function placeItem(item) {
     return;
   }
 
-  // Place Rocks in the ORANGE area
   if (item.id === "rocks") {
 
     if (!oasisPlaced || rocksPlaced >= 1) return;
@@ -323,7 +300,6 @@ function placeItem(item) {
     return;
   }
 
-  // Place Sand in the BLUE area
   if (item.id === "sand") {
 
     const sand = document.createElement("img");
@@ -348,7 +324,6 @@ function placeItem(item) {
     return;
   }
 
-  // Place Mud in the GREEN area
   if (item.id === "mud") {
 
     const mud = document.createElement("img");
@@ -374,7 +349,6 @@ function placeItem(item) {
   }
 }
 
-// Reset the scene
 document.getElementById("resetButton").addEventListener("click", () => {
 
   placedObjects.innerHTML = "";
@@ -382,17 +356,15 @@ document.getElementById("resetButton").addEventListener("click", () => {
   oasisPlaced = false;
   rocksPlaced = 0;
 
-  // Restore original desert background
+ 
   scene.classList.remove("oasis-active");
-
-  // Restore original dry Ghaf tree
+  
   document.getElementById("treeImage").src =
     "assets/Ghaf_tree_yellow_leaves8.png";
 
 });
 
-// Update arrow states when window size changes
+
 window.addEventListener("resize", updateArrows);
 
-// Initialize the tray
 renderTray();
