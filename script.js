@@ -1,4 +1,3 @@
-
 const items = [
   { id: "snow", label: "Snow", image: "Snow.png" },
   { id: "clownfish", label: "Clownfish", image: "Clown_fish.png" },
@@ -18,7 +17,8 @@ const items = [
   { id: "pineTree", label: "Pine tree", image: "Pine_tree.png" },
 ];
 
-const allowedItems = ["oasis", "rocks", "sand", "mud"];
+const nonLivingItems = ["oasis", "rocks", "sand", "mud"];
+const livingItems = ["ghafTree", "fox", "oryx", "lizard", "desertGrasses"];
 
 const trayTrack = document.getElementById("trayTrack");
 const trayWindow = document.getElementById("trayWindow");
@@ -26,10 +26,53 @@ const placedObjects = document.getElementById("placedObjects");
 const leftArrow = document.getElementById("leftArrow");
 const rightArrow = document.getElementById("rightArrow");
 const scene = document.getElementById("scene");
+const questionText = document.querySelector(".question-panel span:last-child");
 
 let drag = null;
 let oasisPlaced = false;
 let rocksPlaced = 0;
+let currentStage = "nonLiving";
+
+const placedItemIds = new Set();
+
+function getItem(id) {
+  return items.find((item) => item.id === id);
+}
+
+function isItemAllowed(id) {
+  const notAllowedItems = [
+    "iceSurface",
+    "oceanWaves",
+    "snow",
+    "clownfish",
+    "penguin",
+    "elephant",
+  ];
+
+  if (notAllowedItems.includes(id)) return false;
+
+  if (currentStage === "nonLiving") {
+    return nonLivingItems.includes(id);
+  }
+
+  return livingItems.includes(id);
+}
+
+function updateStage() {
+  const nonLivingComplete = nonLivingItems.every((id) => placedItemIds.has(id));
+
+  if (nonLivingComplete) {
+    currentStage = "living";
+
+    questionText.innerHTML =
+      "Drag the living things<br>that you can find in the desert.";
+  } else {
+    currentStage = "nonLiving";
+
+    questionText.innerHTML =
+      "Drag the non-living things<br>that you can find in the desert.";
+  }
+}
 
 function renderTray() {
   trayTrack.innerHTML = "";
@@ -59,7 +102,6 @@ function updateArrows() {
   const maxScroll = trayWindow.scrollWidth - trayWindow.clientWidth;
 
   leftArrow.disabled = trayWindow.scrollLeft <= 1;
-
   rightArrow.disabled = trayWindow.scrollLeft >= maxScroll - 1;
 }
 
@@ -87,26 +129,50 @@ trayWindow.addEventListener("wheel", (event) => {
   });
 }, { passive: false });
 
+function createGhost(src, x, y) {
+  const ghost = document.createElement("img");
+
+  ghost.className = "drag-ghost";
+  ghost.src = src;
+
+  document.body.appendChild(ghost);
+
+  ghost.style.left = `${x}px`;
+  ghost.style.top = `${y}px`;
+
+  return ghost;
+}
+
 function startDrag(event, item, sourceCard) {
   if (event.button !== 0) return;
 
   event.preventDefault();
 
-  const ghost = document.createElement("img");
+  const ghost = createGhost(
+    `assets/${item.image}`,
+    event.clientX,
+    event.clientY,
+  );
 
-  ghost.className = "drag-ghost";
-  ghost.src = `assets/${item.image}`;
+  if (item.id === "ghafTree") {
+    const treeImage = document.getElementById("treeImage");
+    const treeBounds = treeImage.getBoundingClientRect();
 
-  document.body.appendChild(ghost);
+    ghost.style.width = `${treeBounds.width}px`;
+    ghost.style.height = `${treeBounds.height}px`;
+  }
+
+  const allowed = isItemAllowed(item.id);
 
   drag = {
     item,
     sourceCard,
     ghost,
     fromScene: false,
+    allowed,
   };
 
-  moveGhost(event.clientX, event.clientY);
+  document.body.style.cursor = allowed ? "grabbing" : "not-allowed";
 
   document.addEventListener("mousemove", moveDrag);
   document.addEventListener("mouseup", endDrag, { once: true });
@@ -117,39 +183,40 @@ function startPlacedDrag(event, itemId, imageElement) {
 
   event.preventDefault();
 
-  const item = items.find((entry) => entry.id === itemId);
+  const item = getItem(itemId);
 
   if (!item) return;
 
-  const ghost = document.createElement("img");
-
-  ghost.className = "drag-ghost";
-  ghost.src = imageElement.src;
-
-  document.body.appendChild(ghost);
-
   drag = {
     item,
-    ghost,
+    ghost: createGhost(imageElement.src, event.clientX, event.clientY),
     fromScene: true,
     original: imageElement,
   };
-
-  moveGhost(event.clientX, event.clientY);
 
   document.addEventListener("mousemove", moveDrag);
   document.addEventListener("mouseup", endDrag, { once: true });
 }
 
-function moveGhost(x, y) {
+function moveDrag(event) {
   if (!drag) return;
 
-  drag.ghost.style.left = `${x}px`;
-  drag.ghost.style.top = `${y}px`;
+  drag.ghost.style.left = `${event.clientX}px`;
+  drag.ghost.style.top = `${event.clientY}px`;
 }
 
-function moveDrag(event) {
-  moveGhost(event.clientX, event.clientY);
+function removeOasisExtras() {
+  oasisPlaced = false;
+  rocksPlaced = 0;
+
+  scene.classList.remove("oasis-active");
+
+  document.getElementById("treeImage").src =
+    "assets/Ghaf_tree_yellow_leaves8.png";
+
+  placedObjects
+    .querySelectorAll('.sun-decoration, [data-item-id="rocks"]')
+    .forEach((element) => element.remove());
 }
 
 function endDrag(event) {
@@ -173,73 +240,81 @@ function endDrag(event) {
     event.clientY < trayRect.top;
 
   if (drag.fromScene && droppedInTray) {
+    const removedId = drag.item.id;
+
     drag.original.remove();
+    placedItemIds.delete(removedId);
 
-    if (drag.item.id === "oasis") {
-      oasisPlaced = false;
-      rocksPlaced = 0;
-
-      scene.classList.remove("oasis-active");
-
-      document.getElementById("treeImage").src =
-        "assets/Ghaf_tree_yellow_leaves8.png";
-
-      const sun = placedObjects.querySelector(".sun-decoration");
-
-      if (sun) {
-        sun.remove();
-      }
-
-      const rocks = placedObjects.querySelectorAll('[data-item-id="rocks"]');
-
-      rocks.forEach((rock) => rock.remove());
+    if (removedId === "oasis") {
+      removeOasisExtras();
     }
 
-    if (drag.item.id === "rocks") {
+    if (removedId === "rocks") {
       rocksPlaced = Math.max(0, rocksPlaced - 1);
     }
-  } else if (!drag.fromScene && droppedInScene) {
-    if (allowedItems.includes(drag.item.id)) {
-      placeItem(drag.item);
-    }
+
+    updateStage();
+  } else if (!drag.fromScene && droppedInScene && isItemAllowed(drag.item.id)) {
+    placeItem(drag.item);
+  } else if (!drag.fromScene && droppedInScene && drag.allowed) {
+    placeItem(drag.item);
   }
 
   drag.ghost.remove();
   drag = null;
 
   document.removeEventListener("mousemove", moveDrag);
-
+  document.body.style.cursor = "default";
   updateArrows();
 }
 
-function placeItem(item) {
-  if (item.id === "oasis") {
-    if (oasisPlaced) return;
+function addPlacedImage(item, options) {
+  const image = document.createElement("img");
 
+  image.src = options.src || `assets/${item.image}`;
+  image.alt = item.label;
+  image.className = `placed ${options.className || ""}`.trim();
+
+  image.dataset.itemId = item.id;
+
+  image.style.left = options.left;
+  image.style.top = options.top;
+  image.style.width = options.width;
+  image.style.height = options.height;
+  image.style.objectFit = "contain";
+  image.style.objectPosition = "center bottom";
+
+  image.addEventListener("mousedown", (event) => {
+    startPlacedDrag(event, item.id, image);
+  });
+
+  placedObjects.appendChild(image);
+
+  placedItemIds.add(item.id);
+
+  updateStage();
+
+  return image;
+}
+
+function placeItem(item) {
+  if (placedItemIds.has(item.id)) return;
+
+  if (item.id === "oasis") {
     oasisPlaced = true;
 
     scene.classList.add("oasis-active");
 
     document.getElementById("treeImage").src = "assets/Ghaf_tree_OA2.png";
 
-    const oasis = document.createElement("img");
-
-    oasis.src = "assets/Oasis.png";
-    oasis.alt = "Oasis water";
-    oasis.className = "placed oasis-image";
-    oasis.dataset.itemId = "oasis";
-
-    oasis.style.left = "48%";
-    oasis.style.top = "59%";
-    oasis.style.width = "27%";
-    oasis.style.height = "17%";
-    oasis.style.objectFit = "contain";
-
-    oasis.addEventListener("mousedown", (event) => {
-      startPlacedDrag(event, "oasis", oasis);
+    addPlacedImage(item, {
+      src: "assets/Oasis.png",
+      className: "oasis-image",
+      left: "48%",
+      top: "59%",
+      width: "27%",
+      height: "17%",
     });
-
-    placedObjects.appendChild(oasis);
 
     const sun = document.createElement("img");
 
@@ -261,24 +336,13 @@ function placeItem(item) {
   if (item.id === "rocks") {
     if (!oasisPlaced || rocksPlaced >= 1) return;
 
-    const rock = document.createElement("img");
-
-    rock.src = "assets/Rocks_hiding_without_lizard1.png";
-    rock.alt = "Desert rocks";
-    rock.className = "placed";
-    rock.dataset.itemId = "rocks";
-
-    rock.style.left = "70%";
-    rock.style.top = "66%";
-    rock.style.width = "9%";
-    rock.style.height = "9%";
-    rock.style.objectFit = "contain";
-
-    rock.addEventListener("mousedown", (event) => {
-      startPlacedDrag(event, "rocks", rock);
+    addPlacedImage(item, {
+      src: "assets/Rocks_hiding_without_lizard1.png",
+      left: "70%",
+      top: "66%",
+      width: "9%",
+      height: "9%",
     });
-
-    placedObjects.appendChild(rock);
 
     rocksPlaced++;
 
@@ -286,47 +350,80 @@ function placeItem(item) {
   }
 
   if (item.id === "sand") {
-    const sand = document.createElement("img");
-
-    sand.src = `assets/${item.image}`;
-    sand.alt = "Sand";
-    sand.className = "placed";
-    sand.dataset.itemId = "sand";
-
-    sand.style.left = "40%";
-    sand.style.top = "68%";
-    sand.style.width = "10%";
-    sand.style.height = "9%";
-    sand.style.objectFit = "contain";
-
-    sand.addEventListener("mousedown", (event) => {
-      startPlacedDrag(event, "sand", sand);
+    addPlacedImage(item, {
+      left: "40%",
+      top: "68%",
+      width: "10%",
+      height: "9%",
     });
-
-    placedObjects.appendChild(sand);
 
     return;
   }
 
   if (item.id === "mud") {
-    const mud = document.createElement("img");
-
-    mud.src = `assets/${item.image}`;
-    mud.alt = "Mud";
-    mud.className = "placed";
-    mud.dataset.itemId = "mud";
-
-    mud.style.left = "70%";
-    mud.style.top = "58%";
-    mud.style.width = "8%";
-    mud.style.height = "8%";
-    mud.style.objectFit = "contain";
-
-    mud.addEventListener("mousedown", (event) => {
-      startPlacedDrag(event, "mud", mud);
+    addPlacedImage(item, {
+      left: "65%",
+      top: "58%",
+      width: "8%",
+      height: "8%",
     });
 
-    placedObjects.appendChild(mud);
+    return;
+  }
+
+  if (item.id === "ghafTree") {
+    addPlacedImage(item, {
+      src: "assets/Ghaf_tree_OA2.png",
+      className: "living-ghaf-tree",
+      left: "54%",
+      top: "20%",
+      width: "24%",
+      height: "43%",
+    });
+
+    return;
+  }
+
+  if (item.id === "fox") {
+    addPlacedImage(item, {
+      left: "66%",
+      top: "60%",
+      width: "9%",
+      height: "8%",
+    });
+
+    return;
+  }
+
+  if (item.id === "oryx") {
+    addPlacedImage(item, {
+      left: "69%",
+      top: "60%",
+      width: "12%",
+      height: "10%",
+    });
+
+    return;
+  }
+
+  if (item.id === "lizard") {
+    addPlacedImage(item, {
+      left: "72%",
+      top: "70%",
+      width: "5%",
+      height: "6%",
+    });
+
+    return;
+  }
+
+  if (item.id === "desertGrasses") {
+    addPlacedImage(item, {
+      left: "43%",
+      top: "62%",
+      width: "8%",
+      height: "8%",
+    });
 
     return;
   }
@@ -335,6 +432,8 @@ function placeItem(item) {
 document.getElementById("resetButton").addEventListener("click", () => {
   placedObjects.innerHTML = "";
 
+  placedItemIds.clear();
+
   oasisPlaced = false;
   rocksPlaced = 0;
 
@@ -342,8 +441,11 @@ document.getElementById("resetButton").addEventListener("click", () => {
 
   document.getElementById("treeImage").src =
     "assets/Ghaf_tree_yellow_leaves8.png";
+
+  updateStage();
 });
 
 window.addEventListener("resize", updateArrows);
 
 renderTray();
+updateStage();
